@@ -289,16 +289,17 @@
   function speak(text, lang){
     if(!('speechSynthesis' in window)) return;
     try{
-      if(window.speechSynthesis.speaking || window.speechSynthesis.pending){
-        window.speechSynthesis.cancel();
-      }
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = lang;
-      const v = pickVoice(lang);
-      if(v) u.voice = v;
-      u.rate = 0.85;
-      currentUtterance = u;
-      window.speechSynthesis.speak(u);
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
+      setTimeout(function(){
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = lang;
+        const v = pickVoice(lang);
+        if(v) u.voice = v;
+        u.rate = 0.85;
+        currentUtterance = u;
+        window.speechSynthesis.speak(u);
+      }, 80);
     }catch(e){}
   }
   if('speechSynthesis' in window){
@@ -324,15 +325,19 @@
     }
     const esCount = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('es')).length;
     const chosen = pickVoice('es-ES');
-    diagResult.textContent = voices.length + " voix, dont " + esCount + " en espagnol. Voix choisie : " + (chosen ? chosen.name + (chosen.localService ? " (locale)" : " (en ligne)") : "aucune (défaut du système)") + ". Test...";
-    const u = new SpeechSynthesisUtterance("Hola, esto es una prueba");
-    if(chosen) u.voice = chosen;
-    u.lang = 'es-ES';
-    u.onstart = function(){ diagResult.textContent += " → lecture démarrée."; };
-    u.onerror = function(e){ diagResult.textContent += " → erreur : " + e.error; };
-    u.onend = function(){ diagResult.textContent += " → terminé."; };
-    currentUtterance = u;
-    window.speechSynthesis.speak(u);
+    diagResult.textContent = voices.length + " voix, dont " + esCount + " en espagnol" + (esCount === 0 ? " (AUCUNE voix espagnole installée sur ce PC)" : "") + ". Voix choisie : " + (chosen ? chosen.name + (chosen.localService ? " (locale)" : " (en ligne)") : "aucune (défaut du système)") + ". Test...";
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
+    setTimeout(function(){
+      const u = new SpeechSynthesisUtterance("Hola, esto es una prueba");
+      if(chosen) u.voice = chosen;
+      u.lang = 'es-ES';
+      u.onstart = function(){ diagResult.textContent += " → lecture démarrée."; };
+      u.onerror = function(e){ diagResult.textContent += " → erreur : " + e.error; };
+      u.onend = function(){ diagResult.textContent += " → terminé."; };
+      currentUtterance = u;
+      window.speechSynthesis.speak(u);
+    }, 80);
   });
 
   const screenHome = document.getElementById('screenHome');
