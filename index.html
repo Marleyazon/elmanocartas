@@ -12,6 +12,8 @@
     --muted:#6b7280;
     --blue:#1f6fd6;
     --blue-dark:#1a5bb0;
+    --purple:#7c3aed;
+    --purple-dark:#6428c9;
     --green:#3fae4a;
     --green-dark:#2f8f39;
     --red:#e5533d;
@@ -32,7 +34,7 @@
   }
   .app{
     width:100%;
-    max-width:420px;
+    max-width:440px;
     background:var(--card);
     border-radius:20px;
     overflow:hidden;
@@ -67,6 +69,28 @@
   .card-icon svg{ width:76px; height:76px; }
   h1{ font-size:22px; margin:6px 0 0; }
   .home-hint{ color:var(--muted); font-size:14px; margin:0; }
+  .squares-row{ display:flex; gap:16px; margin-top:6px; }
+  .square-btn{
+    width:130px; height:130px;
+    border-radius:20px;
+    border:none;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:transform .05s;
+    color:#fff;
+    font-family:inherit;
+  }
+  .square-btn:active{ transform:translateY(6px); }
+  .square-btn.blue{ background:var(--blue); box-shadow:0 10px 0 var(--blue-dark); }
+  .square-btn.blue:active{ box-shadow:0 4px 0 var(--blue-dark); }
+  .square-btn.purple{ background:var(--purple); box-shadow:0 10px 0 var(--purple-dark); }
+  .square-btn.purple:active{ box-shadow:0 4px 0 var(--purple-dark); }
+  .square-btn svg{ width:44px; height:44px; }
+  .square-btn span{ font-size:13px; font-weight:700; }
   .editions{ display:none; flex-direction:column; gap:12px; width:100%; margin-top:6px; }
   .editions.show{ display:flex; }
   .edition-btn{
@@ -83,6 +107,7 @@
     box-shadow:0 6px 0 var(--blue-dark);
   }
   .edition-btn:active{ transform:translateY(4px); box-shadow:0 2px 0 var(--blue-dark); }
+  .edition-btn.purple{ background:var(--purple); box-shadow:0 6px 0 var(--purple-dark); }
   .edition-btn.disabled{
     background:var(--gray);
     color:var(--muted);
@@ -96,24 +121,11 @@
   .close-btn{ background:none; border:none; font-size:22px; color:var(--muted); cursor:pointer; line-height:1; padding:4px; }
   .bar-track{ flex:1; height:12px; background:var(--gray); border-radius:8px; overflow:hidden; }
   .bar-fill{ height:100%; background:var(--green); width:0%; transition:width .3s ease; border-radius:8px; }
+  .bar-fill.purple{ background:var(--purple); }
   .score-pill{ font-size:13px; font-weight:700; color:var(--blue); min-width:52px; text-align:right; }
   .quiz-main{ flex:1; padding:8px 24px 20px; display:flex; flex-direction:column; }
   .instr{ color:var(--muted); font-size:14px; text-align:center; margin:14px 0 4px; }
-  .prompt-word{ font-size:28px; font-weight:800; text-align:center; margin:10px 0 6px; }
-  .listen-btn{
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    margin:16px auto 22px;
-    background:var(--card);
-    border:2px solid var(--blue);
-    color:var(--blue);
-    border-radius:14px;
-    padding:12px 20px;
-    font-size:15px;
-    font-weight:700;
-    font-family:inherit;
-    cursor:pointer;
-  }
-  .listen-btn:active{ background:#eaf2fd; }
+  .prompt-word{ font-size:32px; font-weight:800; text-align:center; margin:20px 0 26px; }
   #answerInput{
     width:100%;
     padding:15px 16px;
@@ -123,6 +135,7 @@
     font-family:inherit;
     color:var(--ink);
     background:#fff;
+    text-align:center;
   }
   #answerInput:focus{ outline:none; border-color:var(--blue); }
   .spacer{ flex:1; }
@@ -170,6 +183,48 @@
     background:#fff; border:2px solid var(--blue); color:var(--blue);
     border-radius:14px; padding:14px; font-size:15px; font-weight:800; font-family:inherit; cursor:pointer;
   }
+
+  /* mode phrases */
+  .listen-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin:6px auto 20px;
+    background:var(--card);
+    border:2px solid var(--purple);
+    color:var(--purple);
+    border-radius:14px;
+    padding:12px 20px;
+    font-size:15px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .listen-btn:active{ background:#f2ecff; }
+  .sentence{
+    font-size:18px;
+    line-height:2.4;
+    text-align:left;
+  }
+  .blank-input{
+    display:inline-block;
+    width:auto;
+    min-width:70px;
+    max-width:220px;
+    padding:4px 8px;
+    margin:0 2px;
+    border:none;
+    border-bottom:2px solid var(--gray);
+    font-family:inherit;
+    font-size:17px;
+    font-weight:700;
+    text-align:center;
+    color:var(--ink);
+    background:#faf9f7;
+    border-radius:4px 4px 0 0;
+  }
+  .blank-input:focus{ outline:none; border-bottom-color:var(--purple); }
+  .blank-input.correct{ border-bottom-color:var(--green); background:#e9f9ea; color:var(--green-dark); }
+  .blank-input.wrong{ border-bottom-color:var(--red); background:#fdeae7; color:var(--red-dark); }
+  .check-btn.purple{ background:var(--purple); box-shadow:0 6px 0 var(--purple-dark); }
 </style>
 </head>
 <body>
@@ -177,18 +232,28 @@
 <div class="app">
 
   <div id="screenHome">
-    <button class="card-icon" id="cardBtn" type="button" aria-label="Ouvrir le traducteur">
-      <svg viewBox="0 0 100 100" fill="none">
-        <path d="M20 30h34v22H32l-8 9v-9h-4z" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
-        <path d="M80 40H46v22h20l8 9v-9h6z" stroke="#fff" stroke-width="4" stroke-linejoin="round" opacity="0.7"/>
-        <path d="M26 38h20M26 45h14" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-        <path d="M52 47h20M52 54h13" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
-      </svg>
-    </button>
+    <div class="squares-row">
+      <button class="square-btn blue" id="cardBtn" type="button" aria-label="Mots à traduire">
+        <svg viewBox="0 0 100 100" fill="none">
+          <path d="M20 30h34v22H32l-8 9v-9h-4z" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M80 40H46v22h20l8 9v-9h6z" stroke="#fff" stroke-width="4" stroke-linejoin="round" opacity="0.7"/>
+          <path d="M26 38h20M26 45h14" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          <path d="M52 47h20M52 54h13" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+        </svg>
+        <span>Mots</span>
+      </button>
+      <button class="square-btn purple" id="btnPhrases" type="button" aria-label="Phrases audio">
+        <svg viewBox="0 0 100 100" fill="none">
+          <path d="M50 20a12 12 0 0 0-12 12v20a12 12 0 0 0 24 0V32a12 12 0 0 0-12-12z" stroke="#fff" stroke-width="4"/>
+          <path d="M30 46v6a20 20 0 0 0 40 0v-6" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+          <path d="M50 72v10" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+          <path d="M38 82h24" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <span>Phrases audio</span>
+      </button>
+    </div>
     <h1>Traducteur de poche</h1>
-    <p class="home-hint" id="homeHint">Appuie sur la carte pour commencer</p>
-    <button id="diagBtn" type="button" style="background:none;border:none;color:#9aa3ad;font-size:12px;text-decoration:underline;cursor:pointer;">Tester le son</button>
-    <p id="diagResult" style="font-size:12px;color:#9aa3ad;max-width:280px;"></p>
+    <p class="home-hint" id="homeHint">Choisis un mode pour commencer</p>
 
     <div class="editions" id="editions">
       <button class="edition-btn disabled" id="btn2025" type="button">
@@ -197,7 +262,7 @@
       </button>
       <button class="edition-btn" id="btn2026" type="button">
         Édition 2026
-        <small>Exercices d'écoute et d'écriture</small>
+        <small>Mots à traduire</small>
       </button>
     </div>
   </div>
@@ -221,27 +286,162 @@
 <script>
 (function(){
 
+  /* ---------------- Vocabulaire (mode mots) ---------------- */
   const VOCAB = [
-    { forms:[{c:"Aeroporche", p:"Aeroportche"}], fr:["Aéroport"] },
-    { forms:[{c:"Dala", p:"Dal"}], fr:["Valise"] },
-    { forms:[{c:"Avìon", p:"Abvion"}], fr:["Avion"] },
-    { forms:[{c:"Carchaporche", p:"Carchaportche"}], fr:["Convoyeur"] },
-    { forms:[{c:"Carchaporche del de dalas", p:"Carchaportche del de dalas"}], fr:["Convoyeur de valises"] },
-    { forms:[{c:"Sole", p:"Sole"}], fr:["Soleil"] },
-    { forms:[{c:"Lùna", p:"Luna"}], fr:["Lune"] },
-    { forms:[{c:"Cìelo", p:"Ciel"}], fr:["Ciel"] },
-    { forms:[{c:"Nùaje", p:"Nuaje"}], fr:["Nuage"] },
-    { forms:[{c:"Plaja", p:"Plaja"}], fr:["Plage"] },
-    { forms:[{c:"Eaù", p:"Eau"}, {c:"O", p:"o"}], fr:["Eau"] },
-    { forms:[{c:"Gùrda", p:"Gurda"}], fr:["Gourde","Cruche","Bouteille"] },
-    { forms:[{c:"Gùrdo", p:"Gurdo"}], fr:["Bouteille d'eau","Gourde d'eau"] },
-    { forms:[{c:"Trùssa", p:"Trussa"}], fr:["Trousse"] },
-    { forms:[{c:"Estámina", p:"Estamina"}, {c:"Estamana del mina de cránta", p:"Estamana del mina de cranta"}], fr:["Crayon de mine","Crayon","Crayon à papier","Crayon de papier","Crayon à mine"] },
-    { forms:[{c:"Gomá", p:"Goma"}], fr:["Gomme"] },
-    { forms:[{c:"Veli", p:"Bveli"}, {c:"Velecipertarador", p:"Bvelesipertarador"}], fr:["Colle"] },
-    { forms:[{c:"Zelcedes", p:"Zelsedes"}], fr:["Ciseaux"] }
+    { forms:[{c:"Aeroporche"}], fr:["Aéroport"] },
+    { forms:[{c:"Dala"}], fr:["Valise"] },
+    { forms:[{c:"Avìon"}], fr:["Avion"] },
+    { forms:[{c:"Carchaporche"}], fr:["Convoyeur"] },
+    { forms:[{c:"Carchaporche del de dalas"}], fr:["Convoyeur de valises"] },
+    { forms:[{c:"Sole"}], fr:["Soleil"] },
+    { forms:[{c:"Lùna"}], fr:["Lune"] },
+    { forms:[{c:"Cìelo"}], fr:["Ciel"] },
+    { forms:[{c:"Nùaje"}], fr:["Nuage"] },
+    { forms:[{c:"Plaja"}], fr:["Plage"] },
+    { forms:[{c:"Eaù"}, {c:"O"}], fr:["Eau"] },
+    { forms:[{c:"Gùrda"}], fr:["Gourde","Cruche","Bouteille"] },
+    { forms:[{c:"Gùrdo"}], fr:["Bouteille d'eau","Gourde d'eau"] },
+    { forms:[{c:"Trùssa"}], fr:["Trousse"] },
+    { forms:[{c:"Estámina"}, {c:"Estamana del mina de cránta"}], fr:["Crayon de mine","Crayon","Crayon à papier","Crayon de papier","Crayon à mine"] },
+    { forms:[{c:"Gomá"}], fr:["Gomme"] },
+    { forms:[{c:"Veli"}, {c:"Velecipertarador"}], fr:["Colle"] },
+    { forms:[{c:"Zelcedes"}], fr:["Ciseaux"] },
+
+    { forms:[{c:"Mama"}], fr:["Maman"] },
+    { forms:[{c:"papa"}], fr:["Papa"] },
+    { forms:[{c:"mare"}], fr:["Mère"] },
+    { forms:[{c:"pare"}], fr:["Père"] },
+    { forms:[{c:"frero"}], fr:["Frère"] },
+    { forms:[{c:"sìstra"}], fr:["Sœur"] },
+    { forms:[{c:"fils"},{c:"fìls"}], fr:["Fils"] },
+    { forms:[{c:"filla"},{c:"fìlla"}], fr:["Fille"] },
+    { forms:[{c:"ahéarandro"}], fr:["Grand-père"] },
+    { forms:[{c:"ahéarandra"}], fr:["Grand-mère"] },
+    { forms:[{c:"amì"}], fr:["Ami","Amie"] },
+
+    { forms:[{c:"Pan"}], fr:["Pain"] },
+    { forms:[{c:"leìte"}], fr:["Lait"] },
+    { forms:[{c:"fromaje"}], fr:["Fromage"] },
+    { forms:[{c:"poma"}], fr:["Pomme"] },
+    { forms:[{c:"vìande"}], fr:["Viande"] },
+    { forms:[{c:"zùebehoblar"}], fr:["Poisson"] },
+    { forms:[{c:"rìs"}], fr:["Riz"] },
+    { forms:[{c:"sùjar"}], fr:["Sucre"] },
+    { forms:[{c:"sel"},{c:"sal"}], fr:["Sel"] },
+
+    { forms:[{c:"maìsone"}], fr:["Maison"] },
+    { forms:[{c:"porta"}], fr:["Porte"] },
+    { forms:[{c:"vìtra"}], fr:["Fenêtre"] },
+    { forms:[{c:"tabla"}], fr:["Table"] },
+    { forms:[{c:"sìlla"},{c:"cartaìa"}], fr:["Chaise"] },
+    { forms:[{c:"lì"}], fr:["Lit"] },
+    { forms:[{c:"cùsìna"}], fr:["Cuisine"] },
+    { forms:[{c:"chambre"}], fr:["Chambre"] },
+    { forms:[{c:"lleva"}], fr:["Clé"] },
+
+    { forms:[{c:"Crana"}], fr:["Tête"] },
+    { forms:[{c:"mano"}], fr:["Main"] },
+    { forms:[{c:"pìe"}], fr:["Pied"] },
+    { forms:[{c:"ojo"}], fr:["Œil"] },
+    { forms:[{c:"boca"}], fr:["Bouche"] },
+    { forms:[{c:"cora"}], fr:["Cœur"] },
+    { forms:[{c:"clavariònas"}], fr:["Cheveux"] },
+
+    { forms:[{c:"roje"}], fr:["Rouge"] },
+    { forms:[{c:"bleù"}], fr:["Bleu"] },
+    { forms:[{c:"bestrìan"},{c:"verte"}], fr:["Vert"] },
+    { forms:[{c:"jaùne"}], fr:["Jaune"] },
+    { forms:[{c:"noìre"}], fr:["Noir"] },
+    { forms:[{c:"blanc"},{c:"blanca"}], fr:["Blanc"] },
+
+    { forms:[{c:"uń"}], fr:["Un"] },
+    { forms:[{c:"do"}], fr:["Deux"] },
+    { forms:[{c:"tre"}], fr:["Trois"] },
+    { forms:[{c:"cùatr"}], fr:["Quatre"] },
+    { forms:[{c:"cìnc"}], fr:["Cinq"] },
+
+    { forms:[{c:"cìen"}], fr:["Chien"] },
+    { forms:[{c:"cato"}], fr:["Chat"] },
+    { forms:[{c:"noltinte"}], fr:["Oiseau"] },
+    { forms:[{c:"cavala"}], fr:["Cheval"] },
+
+    { forms:[{c:"zapatos"}], fr:["Chaussure","Chaussures"] },
+    { forms:[{c:"camìsa"}], fr:["Chemise"] },
+    { forms:[{c:"pantalòn"}], fr:["Pantalon"] },
+    { forms:[{c:"sorpra"}], fr:["Manteau"] },
+    { forms:[{c:"tenisto"}], fr:["Chapeau"] },
+
+    { forms:[{c:"manjar"}], fr:["Manger"] },
+    { forms:[{c:"boìr"},{c:"beber"}], fr:["Boire"] },
+    { forms:[{c:"dormir"}], fr:["Dormir"] },
+    { forms:[{c:"aller"}], fr:["Aller"] },
+    { forms:[{c:"venìr"}], fr:["Venir"] },
+    { forms:[{c:"parlar"}], fr:["Parler"] },
+    { forms:[{c:"regarβar"}], fr:["Regarder"] },
+    { forms:[{c:"adonar"},{c:"adorar"}], fr:["Aimer","Adorer"] },
+
+    { forms:[{c:"bon jue"}], fr:["Bonjour"] },
+    { forms:[{c:"mercì"}], fr:["Merci"] },
+    { forms:[{c:"ùì"}], fr:["Oui"] },
+    { forms:[{c:"no"},{c:"nò"},{c:"nòn"},{c:"non"}], fr:["Non"] },
+    { forms:[{c:"se íl te plaù"},{c:"íl te plaù"}], fr:["S'il te plaît"] },
+    { forms:[{c:"o side"}], fr:["Au revoir"] },
+    { forms:[{c:"tìempo"}], fr:["Temps"] },
+
+    { forms:[{c:"coche"}], fr:["Voiture"] },
+    { forms:[{c:"rùta"}], fr:["Route"] },
+    { forms:[{c:"vìlla"}], fr:["Ville"] },
+    { forms:[{c:"rùa"}], fr:["Rue"] },
+    { forms:[{c:"statìon"}], fr:["Gare"] },
+    { forms:[{c:"tran"}], fr:["Train"] },
+    { forms:[{c:"bato"}], fr:["Bateau"] }
   ];
 
+  /* ---------------- Phrases (mode dictee audio) ---------------- */
+  const PHRASES = [
+    {
+      text: "Mi dala es a la aeroporche en la carchaporche.",
+      phonetic: "mi dale es al aeroportche en la carchaportche",
+      blanks: ["dala", "aeroporche", "carchaporche"]
+    },
+    {
+      text: "A uń veli para colar mi pajá dàns mi caìe.",
+      phonetic: "aun vel par coler mi paja dàns mi caie",
+      blanks: ["veli", "colar", "pajá", "caìe"]
+    },
+    {
+      text: "La ajenda de mi amì es remplaçado todo.",
+      phonetic: "larenda de mi ami es remplassad tode",
+      blanks: ["ajenda", "amì", "remplaçado todo"]
+    },
+    {
+      text: "No prendo la avìon pùrqùe, a era uń accidante para uña cìnema.",
+      phonetic: "no prende lavion porque, aer un acssidante para uña cinema",
+      blanks: ["prendo", "avìon pùrqùe", "era", "para", "cìnema"]
+    },
+    {
+      text: "Mi mare manja del pan dàns la cùsìna.",
+      phonetic: "mi mare manja del pan dans la cùsina",
+      blanks: ["mare", "pan", "cùsìna"]
+    },
+    {
+      text: "Mi pare bée de la eaù e regarβa par las vitras.",
+      phonetic: "mi pare bèe de leau e regardza paras vitras",
+      blanks: ["pare bée", "eaù", "regarβa", "las vitras"]
+    },
+    {
+      text: "La cato noìre dorme en la lì.",
+      phonetic: "la catoire dormen lali",
+      blanks: ["cato noìre dorme", "lì"]
+    },
+    {
+      text: "Me adono mi sìstra e mi frero.",
+      phonetic: "madono mi sistre mi frere",
+      blanks: ["adono", "sìstra", ["frero","bro"]]
+    }
+  ];
+
+  /* ---------------- Texte / correction ---------------- */
   function normalize(s){
     return s.toString()
       .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
@@ -273,19 +473,33 @@
     }
     return best;
   }
+  function isCloseEnough(userRaw, answer){
+    const dist = levenshtein(normalize(userRaw), normalize(answer));
+    const len = normalize(answer).length;
+    const threshold = len > 8 ? 2 : 1;
+    return dist <= threshold;
+  }
+  function bestAcceptedMatch(userRaw, acceptedList){
+    const user = normalize(userRaw);
+    let best = { dist: Infinity, candidate: acceptedList[0] };
+    for(const cand of acceptedList){
+      const dist = levenshtein(user, normalize(cand));
+      if(dist < best.dist) best = { dist, candidate: cand };
+    }
+    return best;
+  }
 
-  let currentUtterance = null;
+  /* ---------------- Voix (mode phrases uniquement) ---------------- */
   function pickVoice(lang){
     const voices = window.speechSynthesis.getVoices();
     const prefix = lang.slice(0,2).toLowerCase();
     const matchLocal = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(prefix) && v.localService);
     if(matchLocal) return matchLocal;
-    const anyLocal = voices.find(v => v.localService);
-    if(anyLocal) return anyLocal;
     const matchAny = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(prefix));
     if(matchAny) return matchAny;
     return null;
   }
+  let currentUtterance = null;
   function speak(text, lang){
     if(!('speechSynthesis' in window)) return;
     try{
@@ -296,7 +510,7 @@
         u.lang = lang;
         const v = pickVoice(lang);
         if(v) u.voice = v;
-        u.rate = 0.85;
+        u.rate = 0.8;
         currentUtterance = u;
         window.speechSynthesis.speak(u);
       }, 80);
@@ -307,39 +521,7 @@
     window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
   }
 
-  const diagBtn = document.getElementById('diagBtn');
-  const diagResult = document.getElementById('diagResult');
-  diagBtn.addEventListener('click', function(){
-    if(!('speechSynthesis' in window)){
-      diagResult.textContent = "Ton navigateur ne supporte pas du tout la synthèse vocale.";
-      return;
-    }
-    const voices = window.speechSynthesis.getVoices();
-    if(voices.length === 0){
-      diagResult.textContent = "0 voix trouvée. Nouvel essai...";
-      setTimeout(function(){
-        const v2 = window.speechSynthesis.getVoices();
-        diagResult.textContent = v2.length + " voix trouvée(s) après réessai. " + (v2.length === 0 ? "Aucune voix installée." : "Clique encore.");
-      }, 1000);
-      return;
-    }
-    const esCount = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('es')).length;
-    const chosen = pickVoice('es-ES');
-    diagResult.textContent = voices.length + " voix, dont " + esCount + " en espagnol" + (esCount === 0 ? " (AUCUNE voix espagnole installée sur ce PC)" : "") + ". Voix choisie : " + (chosen ? chosen.name + (chosen.localService ? " (locale)" : " (en ligne)") : "aucune (défaut du système)") + ". Test...";
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
-    setTimeout(function(){
-      const u = new SpeechSynthesisUtterance("Hola, esto es una prueba");
-      if(chosen) u.voice = chosen;
-      u.lang = 'es-ES';
-      u.onstart = function(){ diagResult.textContent += " → lecture démarrée."; };
-      u.onerror = function(e){ diagResult.textContent += " → erreur : " + e.error; };
-      u.onend = function(){ diagResult.textContent += " → terminé."; };
-      currentUtterance = u;
-      window.speechSynthesis.speak(u);
-    }, 80);
-  });
-
+  /* ---------------- Ecrans ---------------- */
   const screenHome = document.getElementById('screenHome');
   const screenQuiz = document.getElementById('screenQuiz');
   const cardBtn = document.getElementById('cardBtn');
@@ -347,6 +529,7 @@
   const homeHint = document.getElementById('homeHint');
   const btn2025 = document.getElementById('btn2025');
   const btn2026 = document.getElementById('btn2026');
+  const btnPhrases = document.getElementById('btnPhrases');
   const closeBtn = document.getElementById('closeBtn');
 
   cardBtn.addEventListener('click', function(){
@@ -354,36 +537,11 @@
     homeHint.style.display = editions.classList.contains('show') ? 'none' : '';
   });
   btn2025.addEventListener('click', function(){ });
-  btn2026.addEventListener('click', startSession);
+  btn2026.addEventListener('click', startWordSession);
+  btnPhrases.addEventListener('click', startPhraseSession);
   closeBtn.addEventListener('click', endSession);
 
-  let session = [];
-  let idx = 0;
-  let score = 0;
-  let currentAccepted = [];
-  let answered = false;
-
-  function shuffledSession(){
-    const rounds = VOCAB.map(entry => ({
-      entry,
-      dir: Math.random() < 0.5 ? 'c2f' : 'f2c'
-    }));
-    for(let i=rounds.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*(i+1));
-      [rounds[i],rounds[j]]=[rounds[j],rounds[i]];
-    }
-    return rounds;
-  }
-
-  function startSession(){
-    session = shuffledSession();
-    idx = 0;
-    score = 0;
-    screenHome.style.display = 'none';
-    screenQuiz.classList.add('show');
-    document.getElementById('banner').classList.remove('show','correct','wrong');
-    renderRound();
-  }
+  let mode = 'words'; // 'words' | 'phrases'
 
   function endSession(){
     if('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -391,72 +549,98 @@
     screenHome.style.display = '';
     editions.classList.remove('show');
     homeHint.style.display = '';
+    document.getElementById('barFill').className = 'bar-fill';
   }
 
-  function updateHeader(){
-    document.getElementById('scorePill').textContent = score + '/' + session.length;
-    document.getElementById('barFill').style.width = (idx/session.length*100) + '%';
+  /* ================= MODE MOTS ================= */
+  let wSession = [];
+  let wIdx = 0;
+  let wScore = 0;
+  let wAccepted = [];
+  let wAnswered = false;
+
+  function shuffledWordSession(){
+    const pool = VOCAB.slice();
+    for(let i=pool.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [pool[i],pool[j]]=[pool[j],pool[i]];
+    }
+    const picked = pool.slice(0, Math.min(20, pool.length));
+    return picked.map(entry => ({
+      entry,
+      dir: Math.random() < 0.5 ? 'c2f' : 'f2c'
+    }));
   }
 
-  function renderRound(){
-    answered = false;
+  function startWordSession(){
+    mode = 'words';
+    wSession = shuffledWordSession();
+    wIdx = 0;
+    wScore = 0;
+    screenHome.style.display = 'none';
+    screenQuiz.classList.add('show');
+    document.getElementById('barFill').className = 'bar-fill';
+    document.getElementById('banner').classList.remove('show','correct','wrong');
+    renderWordRound();
+  }
+
+  function updateWordHeader(){
+    document.getElementById('scorePill').textContent = wScore + '/' + wSession.length;
+    document.getElementById('barFill').style.width = (wIdx/wSession.length*100) + '%';
+  }
+
+  function renderWordRound(){
+    wAnswered = false;
     const banner = document.getElementById('banner');
     banner.classList.remove('show','correct','wrong');
 
-    if(idx >= session.length){
-      renderRecap();
+    if(wIdx >= wSession.length){
+      renderWordRecap();
       return;
     }
-    updateHeader();
-    const round = session[idx];
+    updateWordHeader();
+    const round = wSession[wIdx];
     const main = document.getElementById('quizMain');
 
     if(round.dir === 'c2f'){
       const form = round.entry.forms[Math.floor(Math.random()*round.entry.forms.length)];
-      currentAccepted = round.entry.fr;
+      wAccepted = round.entry.fr;
       main.innerHTML = `
-        <p class="instr">Écoute le mot et écris sa traduction en français</p>
-        <button class="listen-btn" id="listenBtn" type="button">🔊 Écouter</button>
-        <input type="text" id="answerInput" placeholder="Traduction en français" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <p class="instr">Écris la traduction en français</p>
+        <p class="prompt-word">${form.c}</p>
+        <input type="text" id="answerInput" placeholder="______" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <div class="spacer"></div>
-        <button class="check-btn" id="checkBtn" type="button">Vérifier</button>
+        <button class="check-btn" id="checkBtn" type="button">Valider</button>
       `;
-      document.getElementById('listenBtn').addEventListener('click', () => speak(form.p, 'es-ES'));
-      speak(form.p, 'es-ES');
     } else {
       const frWord = round.entry.fr[Math.floor(Math.random()*round.entry.fr.length)];
-      currentAccepted = round.entry.forms.map(f => f.c);
+      wAccepted = round.entry.forms.map(f => f.c);
       main.innerHTML = `
         <p class="instr">Écris ce mot dans ta langue</p>
         <p class="prompt-word">${frWord}</p>
-        <div class="audio-row" style="display:flex;justify-content:center;">
-          <button class="listen-btn" id="listenBtn" type="button">🔊 Réécouter en français</button>
-        </div>
-        <input type="text" id="answerInput" placeholder="Mot dans ta langue" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <input type="text" id="answerInput" placeholder="______" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <div class="spacer"></div>
-        <button class="check-btn" id="checkBtn" type="button">Vérifier</button>
+        <button class="check-btn" id="checkBtn" type="button">Valider</button>
       `;
-      document.getElementById('listenBtn').addEventListener('click', () => speak(frWord, 'fr-FR'));
-      speak(frWord, 'fr-FR');
     }
 
     const input = document.getElementById('answerInput');
     const checkBtn = document.getElementById('checkBtn');
-    checkBtn.addEventListener('click', submitAnswer);
-    input.addEventListener('keydown', e => { if(e.key === 'Enter' && !answered) submitAnswer(); });
+    checkBtn.addEventListener('click', submitWordAnswer);
+    input.addEventListener('keydown', e => { if(e.key === 'Enter' && !wAnswered) submitWordAnswer(); });
     input.focus();
   }
 
-  function submitAnswer(){
-    if(answered) return;
+  function submitWordAnswer(){
+    if(wAnswered) return;
     const input = document.getElementById('answerInput');
     const raw = input.value.trim();
     if(!raw){ input.focus(); return; }
-    answered = true;
+    wAnswered = true;
     input.disabled = true;
     document.getElementById('checkBtn').disabled = true;
 
-    const match = bestMatch(raw, currentAccepted);
+    const match = bestMatch(raw, wAccepted);
     const len = normalize(match.candidate).length;
     const threshold = len > 8 ? 2 : 1;
 
@@ -465,12 +649,12 @@
     const detail = document.getElementById('bannerDetail');
 
     if(match.dist === 0){
-      score++;
+      wScore++;
       banner.className = 'banner show correct';
       title.textContent = '✓ Correct !';
       detail.textContent = match.candidate;
     } else if(match.dist <= threshold){
-      score++;
+      wScore++;
       banner.className = 'banner show correct';
       title.textContent = '✓ Presque !';
       detail.textContent = "Orthographe correcte : " + match.candidate;
@@ -479,31 +663,202 @@
       title.textContent = "✕ Ce n'est pas ça";
       detail.textContent = "Réponse : " + match.candidate;
     }
-    updateHeader();
+    updateWordHeader();
   }
 
-  document.getElementById('bannerContinue').addEventListener('click', function(){
-    idx++;
-    renderRound();
-  });
-
-  function renderRecap(){
+  function renderWordRecap(){
     document.getElementById('barFill').style.width = '100%';
     const main = document.getElementById('quizMain');
     main.innerHTML = `
       <div class="recap">
         <p class="instr">Édition 2026 — résultat</p>
-        <div class="big">${score}/${session.length}</div>
-        <p>${score === session.length ? "Sans faute !" : "Continue, les mots reviendront."}</p>
+        <div class="big">${wScore}/${wSession.length}</div>
+        <p>${wScore === wSession.length ? "Sans faute !" : "Continue, les mots reviendront."}</p>
         <div class="recap-btns">
           <button class="ghost-btn" id="againBtn" type="button">Recommencer</button>
           <button class="check-btn" id="doneBtn" type="button">Terminer</button>
         </div>
       </div>
     `;
-    document.getElementById('againBtn').addEventListener('click', startSession);
+    document.getElementById('againBtn').addEventListener('click', startWordSession);
     document.getElementById('doneBtn').addEventListener('click', endSession);
   }
+
+  /* ================= MODE PHRASES ================= */
+  let pSession = [];
+  let pIdx = 0;
+  let pScore = 0;
+  let pAnswered = false;
+  let pCurrentBlanks = [];
+
+  function shuffledPhraseSession(){
+    const arr = PHRASES.slice();
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  function startPhraseSession(){
+    mode = 'phrases';
+    pSession = shuffledPhraseSession();
+    pIdx = 0;
+    pScore = 0;
+    screenHome.style.display = 'none';
+    screenQuiz.classList.add('show');
+    document.getElementById('barFill').className = 'bar-fill purple';
+    document.getElementById('banner').classList.remove('show','correct','wrong');
+    renderPhraseRound();
+  }
+
+  function updatePhraseHeader(){
+    document.getElementById('scorePill').textContent = pScore + '/' + pSession.length;
+    document.getElementById('barFill').style.width = (pIdx/pSession.length*100) + '%';
+  }
+
+  function buildSegments(text, blanks){
+    const segments = [];
+    let cursor = 0;
+    blanks.forEach((blank, i) => {
+      const matchText = Array.isArray(blank) ? blank[0] : blank;
+      const idx = text.indexOf(matchText, cursor);
+      if(idx === -1) return;
+      if(idx > cursor){
+        segments.push({ type:'text', value: text.slice(cursor, idx) });
+      }
+      segments.push({ type:'blank', index:i, answer: matchText });
+      cursor = idx + matchText.length;
+    });
+    if(cursor < text.length){
+      segments.push({ type:'text', value: text.slice(cursor) });
+    }
+    return segments;
+  }
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function renderPhraseRound(){
+    pAnswered = false;
+    const banner = document.getElementById('banner');
+    banner.classList.remove('show','correct','wrong');
+
+    if(pIdx >= pSession.length){
+      renderPhraseRecap();
+      return;
+    }
+    updatePhraseHeader();
+    const phrase = pSession[pIdx];
+    pCurrentBlanks = phrase.blanks;
+    const segments = buildSegments(phrase.text, phrase.blanks);
+
+    let html = '<p class="instr">Écoute la phrase et complète les mots manquants</p>';
+    html += '<div class="listen-btn-row" style="display:flex;justify-content:center;">';
+    html += '<button class="listen-btn" id="listenBtn" type="button">🔊 Écouter la phrase</button>';
+    html += '</div>';
+    html += '<p class="sentence">';
+    segments.forEach(seg => {
+      if(seg.type === 'text'){
+        html += escapeHtml(seg.value);
+      } else {
+        const widthCh = Math.max(4, seg.answer.length + 1);
+        html += `<input type="text" class="blank-input" data-index="${seg.index}" style="width:${widthCh}ch" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">`;
+      }
+    });
+    html += '</p>';
+    html += '<div class="spacer"></div>';
+    html += '<button class="check-btn purple" id="checkBtn" type="button">Valider</button>';
+
+    const main = document.getElementById('quizMain');
+    main.innerHTML = html;
+
+    document.getElementById('listenBtn').addEventListener('click', () => speak(phrase.phonetic, 'es-ES'));
+    speak(phrase.phonetic, 'es-ES');
+
+    document.getElementById('checkBtn').addEventListener('click', submitPhraseAnswer);
+    const blankInputs = main.querySelectorAll('.blank-input');
+    blankInputs.forEach((inp, i) => {
+      inp.addEventListener('keydown', e => {
+        if(e.key === 'Enter' && !pAnswered) submitPhraseAnswer();
+      });
+    });
+    if(blankInputs.length) blankInputs[0].focus();
+  }
+
+  function submitPhraseAnswer(){
+    if(pAnswered) return;
+    const main = document.getElementById('quizMain');
+    const blankInputs = main.querySelectorAll('.blank-input');
+    let filled = true;
+    blankInputs.forEach(inp => { if(!inp.value.trim()) filled = false; });
+    if(!filled){ return; }
+
+    pAnswered = true;
+    document.getElementById('checkBtn').disabled = true;
+
+    let allCorrect = true;
+    let wrongList = [];
+    blankInputs.forEach(inp => {
+      const idx = parseInt(inp.getAttribute('data-index'), 10);
+      const answer = pCurrentBlanks[idx];
+      const acceptedList = Array.isArray(answer) ? answer : [answer];
+      inp.disabled = true;
+      const match = bestAcceptedMatch(inp.value, acceptedList);
+      if(isCloseEnough(inp.value, match.candidate)){
+        inp.classList.add('correct');
+      } else {
+        inp.classList.add('wrong');
+        allCorrect = false;
+        wrongList.push(acceptedList.join(' / '));
+      }
+    });
+
+    const banner = document.getElementById('banner');
+    const title = document.getElementById('bannerTitle');
+    const detail = document.getElementById('bannerDetail');
+
+    if(allCorrect){
+      pScore++;
+      banner.className = 'banner show correct';
+      title.textContent = '✓ Correct !';
+      detail.textContent = 'Phrase complète.';
+    } else {
+      banner.className = 'banner show wrong';
+      title.textContent = "✕ Il y a des erreurs";
+      detail.textContent = "Réponse(s) correcte(s) : " + wrongList.join(' / ');
+    }
+    updatePhraseHeader();
+  }
+
+  function renderPhraseRecap(){
+    document.getElementById('barFill').style.width = '100%';
+    const main = document.getElementById('quizMain');
+    main.innerHTML = `
+      <div class="recap">
+        <p class="instr">Phrases audio — résultat</p>
+        <div class="big">${pScore}/${pSession.length}</div>
+        <p>${pScore === pSession.length ? "Sans faute !" : "Continue, les phrases reviendront."}</p>
+        <div class="recap-btns">
+          <button class="ghost-btn" id="againBtn" type="button">Recommencer</button>
+          <button class="check-btn purple" id="doneBtn" type="button">Terminer</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('againBtn').addEventListener('click', startPhraseSession);
+    document.getElementById('doneBtn').addEventListener('click', endSession);
+  }
+
+  /* bannerContinue commun aux deux modes */
+  document.getElementById('bannerContinue').addEventListener('click', function(){
+    if(mode === 'words'){
+      wIdx++;
+      renderWordRound();
+    } else {
+      pIdx++;
+      renderPhraseRound();
+    }
+  });
 
 })();
 </script>
